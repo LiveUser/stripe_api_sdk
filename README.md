@@ -8,6 +8,7 @@ Hecho en 🇵🇷 por Radamés J. Valentín Reyes
 
 ~~~dart
 import 'package:stripe_api_sdk/stripe_api_sdk.dart';
+import 'package:stripe_api_sdk/objects.dart';
 ~~~
 
 ## Get Started
@@ -43,17 +44,54 @@ BalanceTransaction balanceTransaction = await getBalanceTransaction(
 ~~~
 
 ### Create Charge
+~~~dart
+
+~~~
 
 ### Create a Customer
 ~~~dart
 Customer customer = await stripe.createACustomer(
-  email: "valentin.radames@outlook.com", 
-  description: "Radames account", 
-  phone: "1234567890", 
-  name: "Radamés Valentín",
+  customer: Customer(
+    description: "Radamés account", 
+    email: "valentin.radames@outlook.com", 
+    name: "Radamés Valentín", 
+    phone: "1234567890", 
+  ),
 );
 ~~~
 
+### Retrieve a customer
+~~~dart
+Customer retrievedCustomer = await stripe.retrieveCustomer(
+  customerId: "customerId",
+);
+~~~
+### Update a customer
+
+### Delete a customer
+~~~dart
+bool deleted = await stripe.deleteCustomer(customerId: customer.id!);
+~~~
+### List all customers
+~~~dart
+AllCustomersList allCustomersList = await stripe.listAllCustomers();
+~~~
+### List all customers(next page)
+~~~dart
+AllCustomersList allCustomersList = await stripe.listAllCustomers();
+AllCustomersList nextPage = await stripe.listAllCustomers(
+  startingAfter: allCustomersList.customers.last.id,
+);
+~~~
+### Search customers
+
+
+------------------------------------------------------------
+## Contribute/donate by tapping on the Pay Pal logo/image
+
+<a href="https://www.paypal.com/paypalme/onlinespawn"><img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_74x46.jpg"/></a>
+
+------------------------------------------------------------
 # References
 
 - https://stripe.com/docs/api

@@ -6,3 +6,6 @@ void errorThrower(String response){
     throw response;
   }
 }
+String enumToString(Enum enumerator){
+  return enumerator.toString().substring(enumerator.toString().lastIndexOf(".") + 1);
+}

@@ -169,23 +169,23 @@ class BillingAddress{
     required this.state,
   });
   ///City, district, suburb, town, or village.
-  final String city;
+  final String? city;
   ///Two-letter country code (ISO 3166-1 alpha-2).
-  final String country;
+  final String? country;
   ///Address line 1 (e.g., street, PO Box, or company name).
-  final String line1;
+  final String? line1;
   ///Address line 2 (e.g., apartment, suite, unit, or building).
-  final String line2;
+  final String? line2;
   ///ZIP or postal code.
-  final String postal_code;
+  final String? postal_code;
   ///State, county, province, or region.
-  final String state;
+  final String? state;
   ///Email address.
-  final String email;
+  final String? email;
   ///Full name.
-  final String name;
+  final String? name;
   ///Billing phone number (including extension).
-  final String phone;
+  final String? phone;
 }
 //Add properties
 class BillingDetails{
@@ -197,15 +197,84 @@ class BillingDetails{
   });
   ///Billing address.
   final BillingAddress billing_details;
-  final String email;
+  final String? email;
   //Full name.
   final String name;
   ///Billing phone number (including extension).
-  final String phone;
+  final String? phone;
+}
+class CardChecks{
+  CardChecks({
+    required this.address_line1_check,
+    required this.address_postal_code_check,
+    this.cvc_check = "unchecked",
+  });
+  final String? address_line1_check;
+  final String? address_postal_code_check;
+  final String cvc_check;
+}
+class Card{
+  Card({
+    required this.brand,
+    required this.checks,
+  });
+  final String brand;
+  final CardChecks checks;
 }
 //TODO: PaymentMethodDetails
 class PaymentMethodDetails{
-
+  PaymentMethodDetails({
+    required this.card,
+    required this.country,
+    required this.exp_month,
+    required this.exp_year,
+    required this.fingerprint,
+    required this.funding,
+    required this.installments,
+    required this.last4,
+    required this.mandate,
+    required this.moto,
+    required this.network,
+    required this.three_d_secure,
+    required this.wallet,
+    required this.type,
+  });
+  final Card card;
+  final String country;
+  final int exp_month;
+  final int exp_year;
+  final String fingerprint;
+  final String funding;
+  //TODO: Installments in detail
+  final Map<String,dynamic>? installments;
+  final String last4;
+  final String? mandate;
+  //Made up this data type. Docs don't specify.
+  final String? moto;
+  final String network;
+  //Supposed to be an enum but creating it takes too much time
+  final String? three_d_secure;
+  //Not sure about this one. Docs say type hash but they have children like objects
+  final Map<String,dynamic>? wallet;
+  final String type;
+  static PaymentMethodDetails parse(Map<String,dynamic> object){
+    return PaymentMethodDetails(
+      card: object["card"], 
+      country: object["country"], 
+      exp_month: object["exp_month"], 
+      exp_year: object["exp_year"], 
+      fingerprint: object["fingerprint"], 
+      funding: object["funding"], 
+      installments: object["installments"], 
+      last4: object["last4"], 
+      mandate: object["mandate"], 
+      moto: object["moto"], 
+      network: object["network"], 
+      three_d_secure: object["three_d_secure"], 
+      wallet: object["wallet"],
+      type: object["type"],
+    );
+  }
 }
 class ListOfBalanceTransactions{
   ListOfBalanceTransactions({
@@ -236,6 +305,7 @@ class Charge{
     required this.invoice,
     required this.metadata, 
     required this.payment_intent,
+    required this.payment_method,
     required this.payment_method_details,
     required this.receipt_email,
     required this.refunded,
@@ -261,24 +331,25 @@ class Charge{
   ///Whether the charge has been disputed.
   final bool disputed;
   ///ID of the invoice this charge is for if one exists.
-  final String invoice;
+  final String? invoice;
   ///Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
   final Map<String,dynamic> metadata;
   ///ID of the PaymentIntent associated with this charge, if one exists.
-  final String payment_intent;
+  final String? payment_intent;
+  final String payment_method;
   ///Details about the payment method at the time of the transaction.
   ///https://stripe.com/docs/api/charges/object#charge_object-payment_method_details
-  final Map<String,Map<String,String>> payment_method_details;
+  final PaymentMethodDetails payment_method_details;
   ///This is the email address that the receipt for this charge was sent to.
-  final String receipt_email;
+  final String? receipt_email;
   ///Whether the charge has been fully refunded. If the charge is only partially refunded, this attribute will still be false.
   final bool refunded;
   ///Shipping information for the charge.
-  final Map<String,dynamic> shipping;
+  final Map<String,dynamic>? shipping;
   ///For card charges, use statement_descriptor_suffix instead. Otherwise, you can use this value as the complete description of a charge on your customers’ statements. Must contain at least one letter, maximum 22 characters.
-  final String statement_descriptor;
+  final String? statement_descriptor;
   ///Provides information about the charge that customers see on their statements. Concatenated with the prefix (shortened descriptor) or statement descriptor that’s set on the account to form the complete statement descriptor. Maximum 22 characters for the concatenated descriptor.
-  final String statement_descriptor_suffix;
+  final String? statement_descriptor_suffix;
   final ChargeStatus status;
   static Charge parse(Map<String,dynamic> parsedJSON){
     return Charge(
@@ -308,7 +379,8 @@ class Charge{
       invoice: parsedJSON["invoice"], 
       metadata: parsedJSON["metadata"], 
       payment_intent: parsedJSON["payment_intent"], 
-      payment_method_details: parsedJSON["payment_method_details"], 
+      payment_method: parsedJSON["payment_method"],
+      payment_method_details: PaymentMethodDetails.parse(parsedJSON["payment_method_details"]), 
       receipt_email: parsedJSON["receipt_email"], 
       refunded: parsedJSON["refunded"],
       shipping: parsedJSON["shipping"], 
@@ -321,29 +393,29 @@ class Charge{
 //TODO: Create the customer object
 class Customer{
   Customer({
-    required this.id,
-    required this.address,
-    required this.balance,
-    required this.currency,
-    required this.default_source,
-    required this.delinquent,
-    required this.livemode,
-    required this.discount,
+    this.id,
+    this.address,
+    this.balance = 0,
+    this.currency,
+    this.default_source,
+    this.delinquent = false,
+    this.livemode,
+    this.discount,
     this.created,
     this.tax_exempt = "none",
     this.test_clock,
     required this.description,
     required this.email,
-    required this.invoice_prefix,
+    this.invoice_prefix,
     this.metadata,
-    required this.invoice_settings,
-    required this.name,
-    required this.next_invoice_sequence,
-    required this.phone,
-    required this.preferred_locales,
-    required this.shipping,
+    this.invoice_settings,
+    this.name,
+    this.next_invoice_sequence,
+    this.phone,
+    this.preferred_locales,
+    this.shipping,
   });
-    final String id;
+    final String? id;
     final object = "customer";
     final BillingAddress? address;
     final num balance;
@@ -351,16 +423,16 @@ class Customer{
     final String? currency;
     final String? default_source;
     final bool delinquent;
-    final String description;
+    final String? description;
     final Map<String,dynamic>? discount;
-    final String email;
-    final String invoice_prefix;
+    final String? email;
+    final String? invoice_prefix;
     final Map<String,dynamic>? invoice_settings;
-    final bool livemode;
+    final bool? livemode;
     final Map<String,dynamic>? metadata;
-    final String name;
-    final num next_invoice_sequence;
-    final String phone;
+    final String? name;
+    final num? next_invoice_sequence;
+    final String? phone;
     final List? preferred_locales;
     final Map<String,dynamic>? shipping;
     final String tax_exempt;
@@ -386,4 +458,12 @@ class Customer{
         shipping: parsedJSON["shipping"],
       );
     }
+}
+class AllCustomersList{
+  AllCustomersList({
+    required this.has_more,
+    required this.customers,
+  });
+  final bool has_more;
+  final List<Customer> customers;
 }
