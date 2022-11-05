@@ -18,6 +18,8 @@ class Stripe{
   //final String publishableKey;
   final String secretKey;
   late final String _encodedKey;
+  //Get my balance
+  //--------------------------------------------------------------------------------------
   Future<Balance> getMyBalance()async{
     String response = await SexyAPI(
       url: _baseUrl,
@@ -71,6 +73,7 @@ class Stripe{
     return BalanceTransaction.parse(jsonDecode(response));
   }
   //TODO: Charges API
+  //--------------------------------------------------------------------------------------
   Future<String> charge({
     required Charge charge,
     bool livemode = false,
@@ -176,6 +179,7 @@ class Stripe{
     return response;
   }
   //Customers API
+  //--------------------------------------------------------------------------------------
   Future<Customer> createACustomer({
     required Customer customer,
   })async{
@@ -219,8 +223,77 @@ class Stripe{
     Map<String,dynamic> parsedJSON = jsonDecode(response);
     return Customer.parse(parsedJSON);
   }
-  //TODO: Update a customer
-
+  //Update a customer
+  Future<Customer> updateCustomer({
+    required String customerId,
+    BillingAddress? address,
+    String? description,
+    String? email,
+    //TODO: Add metadata
+    //Map<String,dynamic>? metadata,
+    String? name,
+    String? phone,
+    Map<String,dynamic>? shipping,
+  })async{
+    Map<String,dynamic> parameters = {};
+    if(address != null){
+      parameters.addAll({
+        "address": {
+          "city": address.city,
+          "country": address.country,
+          "line1": address.line1,
+          "line2": address.line2,
+          "postal_code": address.postal_code,
+          "state": address.state,
+        },
+      });
+    }
+    if(description != null){
+      parameters.addAll({
+        "description": description,
+      });
+    }
+    if(email != null){
+      parameters.addAll({
+        "email": email,
+      });
+    }
+    /*
+    if(metadata != null){
+      parameters.addAll({
+        
+      });
+    }*/
+    if(name != null){
+      parameters.addAll({
+        "name": name,
+      });
+    }
+    if(phone != null){
+      parameters.addAll({
+        "phone": phone,
+      });
+    }
+    if(shipping != null){
+      parameters.addAll({
+        "shipping": shipping,
+      });
+    }
+    String response = await SexyAPI(
+      url: _baseUrl, 
+      path: "/v1/customers/$customerId",
+      parameters: {},
+    ).post(
+      headers: {
+        "Authorization" : "Basic $_encodedKey",
+        "Content-Type" : "application/x-www-form-urlencoded",
+      },
+      body: toApplicationX_Www_Form_Urlencoded(parameters),
+    );
+    errorThrower(response);
+    Map<String,dynamic> parsedResponse = jsonDecode(response);
+    return Customer.parse(parsedResponse);
+  }
   //Delete a customer
   Future<bool> deleteCustomer({
     required String customerId,
@@ -275,4 +348,31 @@ class Stripe{
     );
   }
   //TODO: Search customers
+  //PaymentIntents API
+  //--------------------------------------------------------------------------------------
+  Future<PaymentIntent> createPaymentIntent({
+    required int amount,
+    String currency = "usd",
+    // ignore: non_constant_identifier_names
+    String payment_method_types = "card",
+  })async{
+    Map<String,dynamic> parameters = {
+      "amount": amount,
+      "currency": currency,
+      "payment_method_types[]": payment_method_types,
+    };
+    String response = await SexyAPI(
+      url: _baseUrl, 
+      path: "/v1/payment_intents",
+      parameters: {},
+    ).post(
+      headers: {
+        "Authorization" : "Basic $_encodedKey",
+        "Content-Type" : "application/x-www-form-urlencoded",
+      },
+      body: toApplicationX_Www_Form_Urlencoded(parameters),
+    );
+    errorThrower(response);
+    return PaymentIntent.parse(jsonDecode(response));
+  }
 }

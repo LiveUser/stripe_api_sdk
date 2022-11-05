@@ -67,7 +67,12 @@ Customer retrievedCustomer = await stripe.retrieveCustomer(
 );
 ~~~
 ### Update a customer
-
+~~~dart
+Customer modifiedCustomer = await stripe.updateCustomer(
+  customerId: "customer_id",
+  name: "Juan del Pueblo",
+);
+~~~
 ### Delete a customer
 ~~~dart
 bool deleted = await stripe.deleteCustomer(customerId: customer.id!);
@@ -85,7 +90,12 @@ AllCustomersList nextPage = await stripe.listAllCustomers(
 ~~~
 ### Search customers
 
-
+### Create a PaymentIntent
+~~~dart
+PaymentIntent paymentIntent = await stripe.createPaymentIntent(
+  amount: 100,
+);
+~~~
 ------------------------------------------------------------
 ## Contribute/donate by tapping on the Pay Pal logo/image
 
@@ -101,3 +111,5 @@ AllCustomersList nextPage = await stripe.listAllCustomers(
 - https://stripe.com/docs/api/charges/object#charge_object-billing_details
 - https://stripe.com/docs/api/charges/object#charge_object-billing_details-address
 - https://stripe.com/docs/api/customers
+- https://support.stripe.com/questions/cannot-charge-a-customer-that-has-no-active-card-error-when-creating-a-charge-using-paymentmethod-and-charges-api
+- https://stripe.com/docs/api/payment_intents

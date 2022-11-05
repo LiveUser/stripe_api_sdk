@@ -75,24 +75,24 @@ void main() {
     //Charge 100 cents(usd).
     String charge = await stripe.charge(
       charge: Charge(
-        id: "ch_3LyKfF2eZvKYlo2C0LrMeOvc", 
+        id: customer.id!, 
         amount: 100, 
         balance_transaction: "txn_1032HU2eZvKYlo2CEPtcnUvl", 
         billing_details: BillingDetails(
           billing_details: BillingAddress(
-            city: null,
-            country: null,
-            line1: null,
-            line2: null,
-            postal_code: null,
-            state: null, 
-            email: null, 
-            name: null, 
-            phone: null,
+            city: customer.address?.city,
+            country: customer.address?.country,
+            line1: customer.address?.line1,
+            line2: customer.address?.line2,
+            postal_code: customer.address?.postal_code,
+            state: customer.address?.state, 
+            email: customer.address?.email, 
+            name: customer.address?.name, 
+            phone: customer.address?.phone,
           ),
-          email: null,
-          phone: null,
-          name: "Jenny Rosen",
+          email: customer.email,
+          phone: customer.phone,
+          name: customer.name!,
         ), 
         currency: "usd", 
         //TODO: Get customer id
@@ -135,5 +135,20 @@ void main() {
       ),
     );
     print(charge);
+  });
+  test("Modify customer", ()async{
+    AllCustomersList allCustomersList = await stripe.listAllCustomers();
+    Customer modifiedCustomer = await stripe.updateCustomer(
+      customerId: allCustomersList.customers.last.id!,
+      name: "Juan del Pueblo",
+    );
+    print(modifiedCustomer.name);
+  });
+  test("Create a PaymentIntent", ()async{
+    PaymentIntent paymentIntent = await stripe.createPaymentIntent(
+      amount: 100,
+    );
+    print(paymentIntent.id);
+    print(paymentIntent.amount);
   });
 }

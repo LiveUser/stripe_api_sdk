@@ -467,3 +467,93 @@ class AllCustomersList{
   final bool has_more;
   final List<Customer> customers;
 }
+class PaymentIntent{
+  PaymentIntent({
+    required this.id,
+    required this.amount,
+    this.automatic_payment_methods,
+    required this.charges,
+    required this.client_secret,
+    required this.currency,
+    required this.customer,
+    required this.description,
+    this.last_payment_error,
+    this.metadata,
+    required this.payment_method,
+    this.next_action,
+    required this.payment_method_types,
+    required this.receipt_email,
+    this.setup_future_usage,
+    this.shipping,
+    this.statement_descriptor,
+    this.statement_descriptor_suffix,
+    required this.status,
+  });
+  ///Unique identifier for the object.
+  final String id;
+  ///Amount intended to be collected by this PaymentIntent. A positive integer representing how much to charge in the smallest currency unit (e.g., 100 cents to charge $1.00 or 100 to charge ¥100, a zero-decimal currency). The minimum amount is $0.50 US or equivalent in charge currency. The amount value supports up to eight digits (e.g., a value of 99999999 for a USD charge of $999,999.99).
+  final int amount;
+  ///Settings to configure compatible payment methods from the Stripe Dashboard
+  final Map<String,dynamic>? automatic_payment_methods;
+  ///Charges that were created by this PaymentIntent, if any.
+  final Map<String,dynamic> charges;
+  ///The client secret of this PaymentIntent. Used for client-side retrieval using a publishable key.
+  ///The client secret can be used to complete a payment from your frontend. It should not be stored, logged, or exposed to anyone other than the customer. Make sure that you have TLS enabled on any page that includes the client secret.
+  ///Refer to our docs to accept a payment and learn about how client_secret should be handled.
+  final String client_secret;
+  ///Three-letter ISO currency code, in lowercase. Must be a supported currency.
+  final String currency;
+  ///ID of the Customer this PaymentIntent belongs to, if one exists.
+  ///Payment methods attached to other Customers cannot be used with this PaymentIntent.
+  ///If present in combination with setup_future_usage, this PaymentIntent’s payment method will be attached to the Customer after the PaymentIntent has been confirmed and any required actions from the user are complete.
+  final String? customer;
+  ///An arbitrary string attached to the object. Often useful for displaying to users.
+  final String? description;
+  ///The payment error encountered in the previous PaymentIntent confirmation. It will be cleared if the PaymentIntent is later updated for any reason.
+  final Map<String,dynamic>? last_payment_error;
+  ///Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format. For more information, see the documentation.
+  final Map<String,dynamic>? metadata;
+  ///If present, this property tells you what actions you need to take in order for your customer to fulfill a payment using the provided source.
+  final Map<String,dynamic>? next_action;
+  ///ID of the payment method used in this PaymentIntent.
+  final String? payment_method;
+  ///The list of payment method types (e.g. card) that this PaymentIntent is allowed to use.
+  final List<String> payment_method_types;
+  ///Email address that the receipt for the resulting payment will be sent to. If receipt_email is specified for a payment in live mode, a receipt will be sent regardless of your email settings.
+  final String? receipt_email;
+  ///Indicates that you intend to make future payments with this PaymentIntent’s payment method.
+  ///Providing this parameter will attach the payment method to the PaymentIntent’s Customer, if present, after the PaymentIntent is confirmed and any required actions from the user are complete. If no Customer was provided, the payment method can still be attached to a Customer after the transaction completes.
+  ///When processing card payments, Stripe also uses setup_future_usage to dynamically optimize your payment flow and comply with regional legislation and network rules, such as SCA.
+  final String? setup_future_usage;
+  ///Shipping information for this PaymentIntent.
+  final Map<String,dynamic>? shipping;
+  ///For non-card charges, you can use this value as the complete description that appears on your customers’ statements. Must contain at least one letter, maximum 22 characters.
+  final String? statement_descriptor;
+  ///Provides information about a card payment that customers see on their statements. Concatenated with the prefix (shortened descriptor) or statement descriptor that’s set on the account to form the complete statement descriptor. Maximum 22 characters for the concatenated descriptor.
+  final String? statement_descriptor_suffix;
+  ///Status of this PaymentIntent, one of requires_payment_method, requires_confirmation, requires_action, processing, requires_capture, canceled, or succeeded. Read more about each PaymentIntent status.
+  final String status;
+  static PaymentIntent parse(Map<String,dynamic> parsedJSON){
+    return PaymentIntent(
+      id: parsedJSON["id"], 
+      amount: parsedJSON["amount"], 
+      automatic_payment_methods: parsedJSON["automatic_payment_methods"],
+      charges: parsedJSON["charges"], 
+      client_secret: parsedJSON["client_secret"], 
+      currency: parsedJSON["currency"], 
+      customer: parsedJSON["customer"], 
+      description: parsedJSON["description"],
+      last_payment_error: parsedJSON["last_payment_error"], 
+      metadata: parsedJSON["metadata"],
+      next_action: parsedJSON["next_action"],
+      payment_method: parsedJSON["payment_method"], 
+      payment_method_types: parsedJSON["payment_method_types"].cast<String>(), 
+      receipt_email: parsedJSON["receipt_email"], 
+      setup_future_usage: parsedJSON["setup_future_usage"],
+      shipping: parsedJSON["shipping"],
+      statement_descriptor: parsedJSON["statement_descriptor"],
+      statement_descriptor_suffix: parsedJSON["statement_descriptor_suffix"],
+      status: parsedJSON["status"],
+    );
+  }
+}
